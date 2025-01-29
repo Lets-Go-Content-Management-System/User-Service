@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SPRING_DATASOURCE_USERNAME=SA
+      - SA_PASSWORD=Rootp@ss123
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+
+# not necessary
+#  user-microservice:
+#    image: user-microservice
+#    container_name: user-service
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    ports:
+#      - "8081:8081"
+#    depends_on:
+#      - sqlserver
+#    environment:
+#      - SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver:1433;databaseName=userdb;encrypt=true;trustServerCertificate=true;loginTimeout=5;
+#      - SPRING_DATASOURCE_USERNAME=sa
+#      - SPRING_DATASOURCE_PASSWORD=Rootp@ss123
+
+volumes:
+  sqlserver-data:
