@@ -2,7 +2,7 @@ package com.letsgo.user_service.user_service.service;
 
 import com.letsgo.user_service.user_service.Repository.UserRepository;
 import com.letsgo.user_service.user_service.dto.UserCreateDTO;
-import com.letsgo.user_service.user_service.dto.UserResponseDTO;
+import com.letsgo.user_service.user_service.dto.CreateUserResponse;
 import com.letsgo.user_service.user_service.model.User;
 import com.letsgo.user_service.user_service.model.enums.RoleEnum;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.time.LocalDateTime;
+
 @Service
 public class UserService {
 
@@ -25,19 +25,18 @@ public class UserService {
 
 
     // mapper for responseDto and User
-    public UserResponseDTO mapToResponseDTO(User user) {
-      return new UserResponseDTO(
+    public CreateUserResponse mapToResponseDTO(User user) {
+      return new CreateUserResponse(
               user.getId(),
               user.getFullName(),
               user.getEmail(),
               user.getRole(),
-              user.getCreatedAt(),
-              user.getUpdatedAt()
+              null
       );
     }
 
     // Create user with hashed password
-    public UserResponseDTO createUser(UserCreateDTO userCreateDTO) {
+    public CreateUserResponse createUser(UserCreateDTO userCreateDTO) {
       String email = userCreateDTO.email();
       Optional<User> existingUser = userRepository.findByEmail(email);
       if(existingUser.isPresent()) {
@@ -48,6 +47,7 @@ public class UserService {
         newUser.setFullName(userCreateDTO.fullName());
         newUser.setEmail(userCreateDTO.email());
         newUser.setPassword(hashedPassword);
+        newUser.setRole(userCreateDTO.role());
 
         // Save the user to the repository
         User savedUser = userRepository.save(newUser);
@@ -60,7 +60,7 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-    public UserResponseDTO updatedUser(UUID id, User updatedUser) {
+    public CreateUserResponse updatedUser(UUID id, User updatedUser) {
         Optional<User> existingUser = userRepository.findById(id);
         if (existingUser.isPresent()) {
             User user = existingUser.get();

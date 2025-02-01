@@ -1,5 +1,6 @@
 package com.letsgo.user_service.user_service.dto;
 
+import com.letsgo.user_service.user_service.model.enums.RoleEnum;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -15,6 +16,8 @@ public record UserCreateDTO(
 
         @NotBlank(message = "Password cannot be blank")
         @Size(min = 6, max = 20, message = "Password must be between 6 and 20 characters")
-        String password) {
+        String password,
+
+        RoleEnum role){
 
 }

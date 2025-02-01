@@ -1,5 +1,6 @@
 package com.letsgo.user_service.user_service.Security;
 
+import com.letsgo.user_service.user_service.config.CustomCorsConfig;
 import com.letsgo.user_service.user_service.service.UserDetailsServiceImpl;
 import com.letsgo.user_service.user_service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +21,18 @@ public class SecurityConfig {
     @Autowired
     private UserDetailsServiceImpl userDetailsServiceImpl;
 
+    @Autowired
+    CustomCorsConfig customCorsConfig;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())  // Optionally disable CSRF protection if needed
+                .cors(c -> c.configurationSource(customCorsConfig))
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()  // Allow all requests without authentication
                 );
+
 
         return http.build();
     }

@@ -2,7 +2,7 @@ package com.letsgo.user_service.user_service.controller;
 
 
 import com.letsgo.user_service.user_service.controller.responses.DefaultResponse;
-import com.letsgo.user_service.user_service.dto.UserResponseDTO;
+import com.letsgo.user_service.user_service.dto.CreateUserResponse;
 import com.letsgo.user_service.user_service.model.Connection;
 import com.letsgo.user_service.user_service.service.ConnectionService;
 import com.letsgo.user_service.user_service.service.UserService;
@@ -44,10 +44,10 @@ public class ConnectionController {
     @Operation(summary = "Get all users a user is following")
     @ApiResponse(responseCode = "200", description = "Following users retrieved successfully")
     @ApiResponse(responseCode = "404", description = "No users followed")
-    public DefaultResponse<List<UserResponseDTO>> getFollowing(
+    public DefaultResponse<List<CreateUserResponse>> getFollowing(
             @RequestParam UUID userId) {
 
-        List<UserResponseDTO> following = connectionService.getFollowing(userId);
+        List<CreateUserResponse> following = connectionService.getFollowing(userId);
         if (following.isEmpty()) {
             return new DefaultResponse<>(HttpStatus.NOT_FOUND.value(), "No users followed", null);
         }
@@ -79,9 +79,9 @@ public class ConnectionController {
     @Operation(summary = "Get all followers of a user")
     @ApiResponse(responseCode = "200", description = "Followers retrieved successfully")
     @ApiResponse(responseCode = "404", description = "No followers found")
-    public DefaultResponse<List<UserResponseDTO>> getAllFollowers(@RequestParam UUID userId) {
+    public DefaultResponse<List<CreateUserResponse>> getAllFollowers(@RequestParam UUID userId) {
 
-        List<UserResponseDTO> followers = connectionService.getAllFollowers(userId);
+        List<CreateUserResponse> followers = connectionService.getAllFollowers(userId);
         if (followers.isEmpty()) {
             return new DefaultResponse<>(HttpStatus.NOT_FOUND.value(), "No followers found", null);
         }
