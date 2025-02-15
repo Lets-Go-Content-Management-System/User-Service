@@ -3,6 +3,7 @@ package com.letsgo.user_service.user_service.model;
 
 import com.letsgo.user_service.user_service.model.enums.RoleEnum;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -25,18 +27,29 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "fullName", nullable = false)
-    private String fullName;
+    @Column(name = "firstName", nullable = false)
+    private String firstName;
 
+    @Column (name = "lastName" , nullable = false)
+    private String lastName;
+
+    @NotNull
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false)
-    private RoleEnum role = RoleEnum.USER;
+    @Column(name = "bio")
+    private String bio;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
 
     @CreationTimestamp
     @Column(name = "createdAt", nullable = false)
@@ -46,14 +59,5 @@ public class User {
     @Column(name = "updatedAt", nullable = false)
     private LocalDateTime updatedAt;
 
-    // one user can have many connections
-
-    // Users this user is following
-//    @OneToMany(mappedBy = "follower")
-//    private Set<Connection> following;
-//
-//    // Users who are following this user
-//    @OneToMany(mappedBy = "following")
-//    private Set<Connection> followers;
 
 }

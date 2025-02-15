@@ -2,14 +2,17 @@ package com.letsgo.user_service.user_service.service;
 
 
 import com.letsgo.user_service.user_service.Repository.ConnectionRepository;
-import com.letsgo.user_service.user_service.dto.CreateUserResponse;
+import com.letsgo.user_service.user_service.dto.CreateUserResponseDto;
 import com.letsgo.user_service.user_service.model.Connection;
 import com.letsgo.user_service.user_service.model.User;
+import com.letsgo.user_service.user_service.model.enums.RoleEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -38,6 +41,8 @@ public class ConnectionService {
     }
 
     // Unfollow a user
+
+    @Transactional
     public void unfollowUser(UUID followerId, UUID followingId) {
         Optional<User> follower = userService.getUserById(followerId);
         Optional<User> following = userService.getUserById(followingId);
@@ -63,14 +68,15 @@ public class ConnectionService {
 //        return user.map(connectionRepository::findByFollowing).orElse(List.of());
 //    }
 
-    public List<CreateUserResponse> getAllFollowers(UUID userId) {
+    public List<CreateUserResponseDto> getAllFollowers(UUID userId) {
         Optional<User> user = userService.getUserById(userId);
         return user.map(u -> connectionRepository.findByFollowing(u).stream()
-                        .map(connection -> new CreateUserResponse(
+                        .map(connection -> new CreateUserResponseDto(
                                 connection.getFollower().getId(),
-                                connection.getFollower().getFullName(),
                                 connection.getFollower().getEmail(),
-                                connection.getFollower().getRole(),
+                                connection.getFollower().getFirstName(),
+                                connection.getFollower().getLastName(),
+                                connection.getFollower().getRoles().stream().map(role -> role.getName()).collect(Collectors.toSet()),
                                 null // Token is not available here; set to null or fetch it if needed
                                 ))
                         .collect(Collectors.toList()))
@@ -78,14 +84,15 @@ public class ConnectionService {
     }
 
 
-    public List<CreateUserResponse> getFollowing(UUID userId) {
+    public List<CreateUserResponseDto> getFollowing(UUID userId) {
         Optional<User> user = userService.getUserById(userId);
         return user.map(u -> connectionRepository.findByFollower(u).stream()
-                        .map(connection -> new CreateUserResponse(
+                        .map(connection -> new CreateUserResponseDto(
                                 connection.getFollowing().getId(),
-                                connection.getFollowing().getFullName(),
                                 connection.getFollowing().getEmail(),
-                                connection.getFollowing().getRole(),
+                                connection.getFollowing().getFirstName(),
+                                connection.getFollowing().getLastName(),
+                                connection.getFollowing().getRoles().stream().map(role -> role.getName()).collect(Collectors.toSet()),
                                 null
                                 ))
                         .collect(Collectors.toList()))

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 // custom spring security service impl
 @Service
@@ -31,9 +32,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User user = userOptional.get();
 
         // Convert user's role to GrantedAuthority
-        List<GrantedAuthority> authorities = Collections.singletonList(
-                new SimpleGrantedAuthority(user.getRole().name()) // Assuming role is an Enum
-        );
+        List<GrantedAuthority> authorities = user.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName())) // Assuming role.getName() returns RoleEnum name
+                .collect(Collectors.toList());
 
         // Return Spring Security's UserDetails object
         return new org.springframework.security.core.userdetails.User(
