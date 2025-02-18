@@ -8,6 +8,8 @@ import com.letsgo.user_service.user_service.model.Role;
 import com.letsgo.user_service.user_service.model.User;
 import com.letsgo.user_service.user_service.model.enums.RoleEnum;
 import exceptions.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,6 +39,8 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    Logger logger = LoggerFactory.getLogger(UserService.class);
+
 
     private Role getDefaultRole() {
         // Try to find the default role (e.g., ROLE_USER)
@@ -54,16 +58,22 @@ public class UserService {
 
     // Create user with hashed password
     public CreateUserResponseDto createUser(CreateUserRequestDto requestDto) {
-      String email = requestDto.email();
-      Optional<User> existingUser = userRepository.findByEmail(email);
-      if(existingUser.isPresent()) {
-          throw new DuplicateKeyException("User with the email address already exists");
-      }
-      String hashedPassword = passwordEncoder.encode(requestDto.password());
-      User newUser = new User();
-        newUser.setFirstName(requestDto.firstName());
-        newUser.setLastName(requestDto.lastName());
-        newUser.setEmail(requestDto.email());
+        logger.info("requestDto received: {}", requestDto);
+        String email = requestDto.email();
+        logger.info("requestDto user by email: {}", requestDto.email());
+
+        Optional<User> existingUser = userRepository.findByEmail(email);
+        logger.info("found user by email: {}", requestDto.email());
+
+        if (existingUser.isPresent()) {
+            throw new DuplicateKeyException("User with the email address already exists");
+        }
+
+        String hashedPassword = passwordEncoder.encode(requestDto.password());
+        User newUser = new User();
+        newUser.setEmail(requestDto.email());         // Ensure this is correct
+        newUser.setFirstName(requestDto.firstName()); // Ensure this is correct
+        newUser.setLastName(requestDto.lastName());   // Ensure this is correct
         newUser.setPassword(hashedPassword);
 
         // Assign roles
@@ -74,6 +84,7 @@ public class UserService {
                 .collect(Collectors.toSet());
 
         newUser.setRoles(roles);
+
         // Save the user to the repository
         User savedUser = userRepository.save(newUser);
 
@@ -91,11 +102,12 @@ public class UserService {
         String hashedPassword = passwordEncoder.encode(createUserRequestDto.password());
         if (existingUser.isPresent()) {
             User user = existingUser.get();
+            user.setEmail(createUserRequestDto.email());
             user.setFirstName(createUserRequestDto.firstName());
             user.setLastName(createUserRequestDto.lastName());
-            user.setEmail(createUserRequestDto.lastName());
+
 //            user.setBio(createUserRequestDto.());
-            user.setPassword(passwordEncoder.encode(hashedPassword));
+            user.setPassword(hashedPassword);
             user.setUpdatedAt(LocalDateTime.now());
             User savedUser = userRepository.save(user);
 

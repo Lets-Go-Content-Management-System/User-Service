@@ -10,10 +10,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+//@Getter
+//@Setter
+//@AllArgsConstructor
+//@NoArgsConstructor
 @Entity
 public class Connection {
     @Id
@@ -36,4 +36,47 @@ public class Connection {
     @UpdateTimestamp
     @Column(name = "connection_timestamp", nullable = false)
     private LocalDateTime connectionTimestamp;
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public User getFollower() {
+        return follower;
+    }
+
+    public void setFollower(User follower) {
+        this.follower = follower;
+    }
+
+    public User getFollowing() {
+        return following;
+    }
+
+    public void setFollowing(User following) {
+        this.following = following;
+    }
+
+    public LocalDateTime getConnectionTimestamp() {
+        return connectionTimestamp;
+    }
+
+    public void setConnectionTimestamp(LocalDateTime connectionTimestamp) {
+        this.connectionTimestamp = connectionTimestamp;
+    }
+
+    public Connection(UUID id, User follower, User following, LocalDateTime connectionTimestamp) {
+        this.id = id;
+        this.follower = follower;
+        this.following = following;
+        this.connectionTimestamp = connectionTimestamp;
+    }
+    public Connection() {
+        // No-args constructor needed by frameworks like Hibernate
+    }
+
 }

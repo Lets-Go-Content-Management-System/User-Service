@@ -103,8 +103,8 @@ import java.util.stream.Collectors;
                 // Generate a new JWT token with updated roles
                 String token = JwtHelper.generateToken(
                         existingUser.getEmail(),
-                        existingUser.getLastName(),
                         existingUser.getFirstName(),
+                        existingUser.getLastName(),
                         existingUser.getId(),
                         roleEnums // Updated roles
                 );
@@ -162,8 +162,8 @@ import java.util.stream.Collectors;
                 // Generate a new JWT token with the updated roles
                 String token = JwtHelper.generateToken(
                         existingUser.getEmail(),
-                        existingUser.getLastName(),
                         existingUser.getFirstName(),
+                        existingUser.getLastName(),
                         existingUser.getId(),
                         roleEnums // Updated roles
                 );

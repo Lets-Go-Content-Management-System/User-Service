@@ -16,10 +16,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+//@Getter
+//@Setter
+//@AllArgsConstructor
+//@NoArgsConstructor
 @Entity
 @Table(name = "App_User")
 public class User {
@@ -27,15 +27,16 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @NotNull
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
+
     @Column(name = "firstName", nullable = false)
     private String firstName;
 
     @Column (name = "lastName" , nullable = false)
     private String lastName;
 
-    @NotNull
-    @Column(name = "email", nullable = false, unique = true)
-    private String email;
 
     @Column(name = "password", nullable = false)
     private String password;
@@ -59,5 +60,92 @@ public class User {
     @Column(name = "updatedAt", nullable = false)
     private LocalDateTime updatedAt;
 
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public @NotNull String getEmail() {
+        return email;
+    }
+
+    public void setEmail(@NotNull String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public User(UUID id, String firstName, String lastName, String email, String password, String bio, Set<Role> roles, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.bio = bio;
+        this.roles = roles;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
+    public User() {
+        // No-args constructor needed by frameworks like Hibernate
+    }
 
 }

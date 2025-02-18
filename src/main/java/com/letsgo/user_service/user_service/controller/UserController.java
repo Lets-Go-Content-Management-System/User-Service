@@ -17,6 +17,8 @@ import exceptions.NotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,6 +55,8 @@ public class UserController {
     @Autowired
     private RoleService roleService;
 
+    Logger logger = LoggerFactory.getLogger(UserController.class);
+
 
     @PostMapping
     @Operation(summary = "Create a new user and return token", description = "Create a new user in the system with the provided details.")
@@ -77,7 +81,7 @@ public class UserController {
             // Generate JWT Token
             String token = JwtHelper.generateToken(
                     user.getEmail(),
-                    user.getLastName(),
+                    user.getFirstName(),
                     user.getLastName(),
                     user.getId(),
                     roleEnums // Assuming user.getRole() returns RoleEnum
@@ -118,10 +122,12 @@ public class UserController {
     public ResponseEntity<DefaultResponse<CreateUserResponseDto>> login(@RequestBody LoginDto loginDto) {
         try {
             // Authenticate user
+            logger.info("Attempting to authenticate user with email: {}", loginDto.email());
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginDto.email(), loginDto.password())
             );
 
+            logger.info("User authenticated successfully. Fetching user details...");
             // Fetch user details from database
             User user = userService.findUserByEmail(loginDto.email())
                     .orElseThrow(() -> new NotFoundException("User not found with email: " + loginDto.email()));
@@ -130,37 +136,48 @@ public class UserController {
                     .map(role -> role.getName()) // Assuming getName() returns RoleEnum
                     .collect(Collectors.toSet());
 
+            logger.info("User found: {}", user.getEmail());
+            logger.info("Roles mapped: {}", roleEnums);
+
             // Generate JWT Token
             String token = JwtHelper.generateToken(
                     user.getEmail(),
-                    user.getLastName(),
+                    user.getFirstName(),
                     user.getLastName(),
                     user.getId(),
                     roleEnums // Assuming user.getRole() returns RoleEnum
             );
 
-
+            logger.info("JWT token generated successfully.");
 
             // Create a new UserResponseDTO with the token
             CreateUserResponseDto userResponseWithToken = new CreateUserResponseDto(
                     user.getId(),
                     user.getEmail(),
-                    user.getLastName(),
                     user.getFirstName(),
+                    user.getLastName(),
                     roleEnums,
                     token
             );
 
+            logger.info("User response DTO created successfully.");
 
             return ResponseEntity.ok(new DefaultResponse<>(200, "Login successful", userResponseWithToken));
 
         } catch (BadCredentialsException e) {
+            logger.error("Invalid credentials for email: {}", loginDto.email(), e);
             DefaultResponse<CreateUserResponseDto> response = new DefaultResponse<>(401, "Invalid credentials", null);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        } catch (NotFoundException e) {
+            logger.error("User not found with email: {}", loginDto.email(), e);
+            DefaultResponse<CreateUserResponseDto> response = new DefaultResponse<>(404, e.getMessage(), null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         } catch (Exception e) {
+            logger.error("Internal server error during login for email: {}", loginDto.email(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new DefaultResponse<>(500, "Internal server error", null));
+                    .body(new DefaultResponse<>(500, "Internal server error: " + e.getMessage(), null));
         }
+
     }
 
     @PostMapping("/logout")
@@ -274,8 +291,8 @@ public class UserController {
 
                 String token = JwtHelper.generateToken(
                         user.get().getEmail(),
-                        user.get().getLastName(),
                         user.get().getFirstName(),
+                        user.get().getLastName(),
                         user.get().getId(),
                         roleEnums // Updated roles
                 );
